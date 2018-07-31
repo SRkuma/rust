@@ -9,43 +9,42 @@ fn read_line() -> String {
     buf.trim().to_owned()
 }
 
-fn parse_vec<T: str::FromStr>() -> Vec<T> {
+fn parse_vec<T: str::FromStr>() -> Result<Vec<T>, T::Err> {
     read_line()
         .split_whitespace()
-        .map(|e| e.parse().ok().unwrap())
+        .map(|e| e.parse())
         .collect()
 }
 
 fn main() {
-
     let n = {
         let ab = parse_vec::<i32>();
-        (ab[0])
+        (ab.unwrap()[0])
     };
 
-    let mut res = n;
+    let result = (0..n+1).fold(n, |memo, ind| {
+        let cc = calc(n, ind);
 
-    for ind in 0..n {
-        let mut cc = 0;
-        calc(n, ind, &mut cc);
-
-        if res > cc {
-            res = cc;
+        if memo > cc {
+            return cc;
         }
-    }
+        memo
+    });
 
-    println!("{}", res);
+    println!("{}", result);
 }
 
-fn calc(n: i32, ind: i32, cc: &mut i32) {
+fn calc(n: i32, ind: i32) -> i32 {
+    let mut cc = 0;
     let mut tmp = ind;
     while tmp > 0 {
-        *cc += tmp % 6;
+        cc += tmp % 6;
         tmp /= 6;
     }
-    tmp = n - ind;
+    let mut tmp = n - ind;
     while tmp > 0 {
-        *cc += tmp % 9;
+        cc += tmp % 9;
         tmp /= 9;
     }
+    cc
 }
