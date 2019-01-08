@@ -20,12 +20,14 @@ fn main() {
 
 fn other_thread(clone: Arc<AtomicIsize>) -> JoinHandle<()> {
     return thread::spawn(move || {
-        for _i in 1..20 {
-            let tmp1_ptr = clone.load(Ordering::Relaxed);
-            let new = tmp1_ptr + 1;
-            let old = clone.load(Ordering::Relaxed);
-            let _value = clone.compare_and_swap(old, new, Ordering::Relaxed);
-            thread::sleep(Duration::from_millis(1));
+        for _i in 0..20 {
+            let mut old = clone.load(Ordering::SeqCst);
+            let mut new = old + 1;
+            while clone.compare_and_swap(old, new, Ordering::SeqCst) != old {
+                old = clone.load(Ordering::SeqCst);
+                new = old + 1;
+                thread::sleep(Duration::from_millis(1));
+            };
         }
     })
 }
