@@ -1,0 +1,6 @@
+[package]
+name = "concurency"
+version = "0.1.0"
+authors = ["Ryo Sakuma <SRkuma@users.noreply.github.com>"]
+
+[dependencies]
